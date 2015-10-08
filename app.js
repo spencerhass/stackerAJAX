@@ -88,5 +88,34 @@ var getUnanswered = function(tags) {
 	});
 };
 
+var getInspiration = function(answerers) {
+
+	//parameters to pass in request to StackOverflow's API
+	var request = {tag: answerers,
+								period: 'month',
+								site: 'stackoverflow'};
+
+	var result = $.ajax({
+		url: "http://api.stackexchange.com/2.2/tags/request/top-answerers/month?site=stackoverflow" + request.tag + "/top-answerers/" + request.period,
+		data: request,
+		dataType: "jsonp",
+		type: "GET",
+	})
+	.done(function(result){
+		var searchResults = showSearchResults(request.tag, result.items.length);
+
+		$('.search-results').html(searchResults);
+
+		$.each(result.items, function(i, item){
+			var topUsers = showUser(item);
+			$('.results').append(topUsers);
+		}); //end each
+	}) //end done
+
+	.fail(function(jqXHR, error, errorThrown){
+		var errorElem = showError(error);
+		$('.search-results').append(errorElem);
+	});
+};
 
 
