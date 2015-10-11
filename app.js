@@ -4,10 +4,17 @@ $(document).ready( function() {
 		$('.results').html('');
 		// get the value of the tags the user submitted
 		var tags = $(this).find("input[name='tags']").val();
-		getUnanswered(tags);
+		getUnanswered(tags);	
 	});
+
+	$('.inspiration-getter').submit(function(event){
+		$('.results').html('');
+		var answerers = $(this).find("input[name='answerers']").val();
+			getInspiration(answerers);
+	})
 });
 
+	
 // this function takes the question object returned by StackOverflow 
 // and creates new result to be appended to DOM
 var showQuestion = function(question) {
@@ -37,6 +44,22 @@ var showQuestion = function(question) {
 							'</p>' +
  							'<p>Reputation: ' + question.owner.reputation + '</p>'
 	);
+
+	return result;
+};
+
+var showAnswerer = function(answerers) {
+	var result= $('.templates .answerer').clone();
+
+	var userElem = result.find('.user a');
+	userElem.attr('href, answerer.user.link');
+	userElem.text(answerers.user.display_name);
+
+	var postElem = result.find('.post-count');
+	postElem.text(answerers.post_count);
+
+	var scoreElem = result.find('.user-score');
+	scoreElem.text(answerers.score);
 
 	return result;
 };
@@ -92,11 +115,11 @@ var getInspiration = function(answerers) {
 
 	//parameters to pass in request to StackOverflow's API
 	var request = {tag: answerers,
-								period: 'month',
+								period: 'all_time',
 								site: 'stackoverflow'};
 
 	var result = $.ajax({
-		url: "http://api.stackexchange.com/2.2/tags/request/top-answerers/month?site=stackoverflow" + request.tag + "/top-answerers/" + request.period,
+		url: "http://api.stackexchange.com/2.2/tags/" + request.tag + "/top-answerers/" + request.period,
 		data: request,
 		dataType: "jsonp",
 		type: "GET",
@@ -107,8 +130,8 @@ var getInspiration = function(answerers) {
 		$('.search-results').html(searchResults);
 
 		$.each(result.items, function(i, item){
-			var topUsers = showUser(item);
-			$('.results').append(topUsers);
+			var topAnswerer = showAnswerer(item);
+			$('.results').append(topAnswerer);
 		}); //end each
 	}) //end done
 
