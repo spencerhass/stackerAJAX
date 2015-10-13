@@ -48,18 +48,18 @@ var showQuestion = function(question) {
 	return result;
 };
 
-var showAnswerer = function(answerers) {
-	var result= $('.templates .answerer').clone();
+var showUser = function(answerers) {
+	var result = $('.templates .user').clone();
 
-	var userElem = result.find('.user a');
-	userElem.attr('href, answerer.user.link');
-	userElem.text(answerers.user.display_name);
+	result.find('.profile-img img').attr('src', answerers.user.profile_image);
 
-	var postElem = result.find('.post-count');
-	postElem.text(answerers.post_count);
+	var displayName = result.find('.display-name a');
+	displayName.attr('href', answerers.user.link);
+	displayName.text(answerers.user.display_name);
 
-	var scoreElem = result.find('.user-score');
-	scoreElem.text(answerers.score);
+	result.find('.reputation').text(answerers.user.reputation);
+
+	result.find('.score').text(answerers.score);
 
 	return result;
 };
@@ -111,27 +111,30 @@ var getUnanswered = function(tags) {
 	});
 };
 
+
+
 var getInspiration = function(answerers) {
 
 	//parameters to pass in request to StackOverflow's API
-	var request = {tag: answerers,
-								period: 'all_time',
+	var queryParameters = {
+						
 								site: 'stackoverflow'};
 
 	var result = $.ajax({
-		url: "http://api.stackexchange.com/2.2/tags/" + request.tag + "/top-answerers/" + request.period,
-		data: request,
+		url: "http://api.stackexchange.com/2.2/tags/" + answerers + "/top-answerers/all_time",
+		data: queryParameters,
 		dataType: "jsonp",
 		type: "GET",
 	})
 	.done(function(result){
-		var searchResults = showSearchResults(request.tag, result.items.length);
+		var searchResults = showSearchResults(answerers, result.items.length);
 
 		$('.search-results').html(searchResults);
 
 		$.each(result.items, function(i, item){
-			var topAnswerer = showAnswerer(item);
-			$('.results').append(topAnswerer);
+			var topUser = showUser(item);
+			console.log(topUser);
+			$('.results').append(topUser);
 		}); //end each
 	}) //end done
 
